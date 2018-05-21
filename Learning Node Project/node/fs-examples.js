@@ -1,13 +1,14 @@
 const fs = require('fs');
 
 fs.readFile('./hello.txt', (err, data) => {
+	console.time('programRunTime');
 	if (err) {
 		console.log('error! error!');
-		return;
 	} else {
 		console.log('Async', data.toString());
-		return;
 	}
+	console.timeEnd('programRunTime');
+	return;
 });
 
 const file = fs.readFileSync('./hello.txt');
