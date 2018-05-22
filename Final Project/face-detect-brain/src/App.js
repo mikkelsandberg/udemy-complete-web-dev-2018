@@ -68,7 +68,6 @@ class App extends Component {
 	};
 
 	displayFaceBox = boundingBox => {
-		console.log(boundingBox);
 		this.setState({
 			boundingBox: boundingBox
 		});
