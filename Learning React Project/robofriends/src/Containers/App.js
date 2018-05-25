@@ -1,34 +1,36 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import CardList from '../Components/CardList';
 import SearchBox from '../Components/SearchBox';
 import Scroll from '../Components/Scroll';
 import ErrorBoundary from '../Components/ErrorBoundary';
 import './App.css';
 
-class App extends Component {
-	constructor() {
-		super();
+import { setSearchField, requestRobots } from '../actions';
 
-		this.state = {
-			robots: [],
-			searchTerm: ''
-		};
-	}
-
-	componentDidMount() {
-		fetch('https://jsonplaceholder.typicode.com/users')
-			.then(response => response.json())
-			.then(users => this.setState({ robots: users }));
-	}
-
-	onSearchChange = e => {
-		this.setState({
-			searchTerm: e.target.value
-		});
+const mapStateToProps = state => {
+	return {
+		searchTerm: state.searchRobots.searchTerm,
+		robots: state.requestRobots.robots,
+		isPending: state.requestRobots.isPending,
+		error: state.requestRobots.error
 	};
+};
+
+const mapDispatchToProps = dispatch => {
+	return {
+		onSearchChange: e => dispatch(setSearchField(e.target.value)),
+		onRequestRobots: () => dispatch(requestRobots())
+	};
+};
+
+class App extends Component {
+	componentDidMount() {
+		this.props.onRequestRobots();
+	}
 
 	render() {
-		const { robots, searchTerm } = this.state;
+		const { searchTerm, onSearchChange, robots, isPending } = this.props;
 
 		const filteredRobots = robots.filter(robot => {
 			return robot.name.toLowerCase().includes(searchTerm.toLowerCase());
@@ -36,8 +38,8 @@ class App extends Component {
 
 		return (
 			<div className="tc">
-				<h1 className="f1">{!robots.length ? 'Loading' : 'RoboFriends'}</h1>
-				<SearchBox searchChange={this.onSearchChange} />
+				<h1 className="f1">{isPending ? 'Loading' : 'RoboFriends'}</h1>
+				<SearchBox searchChange={onSearchChange} />
 				<Scroll>
 					<ErrorBoundary>
 						<CardList robots={filteredRobots} />
@@ -48,4 +50,4 @@ class App extends Component {
 	}
 }
 
-export default App;
+export default connect(mapStateToProps, mapDispatchToProps)(App);
